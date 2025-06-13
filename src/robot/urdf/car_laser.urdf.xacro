@@ -1,0 +1,33 @@
+<!--
+    小车底盘添加雷达
+-->
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+    <material name="blue">
+        <color rgba="0.0 0.0 0.4 0.95" />
+    </material>
+
+    <!-- 雷达属性 -->
+    <xacro:property name="laser_length" value="0.03" /> <!-- 雷达长度 -->
+    <xacro:property name="laser_radius" value="0.03" /> <!-- 雷达半径 -->
+    <xacro:property name="laser_joint_x" value="0.0" /> <!-- 雷达安装的x坐标 -->
+    <xacro:property name="laser_joint_y" value="0.0" /> <!-- 雷达安装的y坐标 -->
+    <xacro:property name="laser_joint_z" value="${base_link_z / 2 + laser_length / 2}" /> <!-- 雷达安装的z坐标:车体高度 / 2 + 雷达高度 / 2  -->
+
+    <!-- 雷达关节以及link -->
+    <link name="laser">
+        <visual>
+            <geometry>
+                <cylinder radius="${laser_radius}" length="${laser_length}" />
+            </geometry>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <material name="blue" />
+        </visual>
+    </link>
+
+    <joint name="laser2baselink" type="fixed">
+        <parent link="base_link" />
+        <child link="laser" />
+        <origin xyz="${laser_joint_x} ${laser_joint_y} ${laser_joint_z}" />
+    </joint>
+</robot>
