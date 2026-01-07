@@ -114,12 +114,4 @@ ros2 launch robot yolo.launch.py
 * 加入动态目标避障与任务规划
 * 支持真实机器人部署
 
----
-
-## 简历 / GitHub 可用描述
-
-**GitHub（ROS2 移动机器人系统架构与 SLAM 导航实现 demo）**:
-[https://github.com/changchuanyong/robot_ws](https://github.com/changchuanyong/robot_ws)
-
-```
 
