@@ -18,12 +18,12 @@ def generate_launch_description():
     slam_params_file = os.path.join(robot_share_dir, "config", "slam_toolbox.yaml")
     slam_rviz_file = os.path.join(robot_share_dir, "rviz", "slam.rviz")
 
-    use_rviz = LaunchConfiguration("use_rviz")
+    use_rviz = LaunchConfiguration("slam_rviz")
     autostart = LaunchConfiguration("autostart")
     use_lifecycle_manager = LaunchConfiguration("use_lifecycle_manager")
 
-    declare_use_rviz = DeclareLaunchArgument(
-        "use_rviz",
+    declare_slam_rviz = DeclareLaunchArgument(
+        "slam_rviz",
         default_value="true",
         description="Start RViz with the SLAM display configuration.",
     )
@@ -98,7 +98,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        declare_use_rviz,
+        declare_slam_rviz,
         declare_autostart,
         declare_use_lifecycle_manager,
         gazebo,
