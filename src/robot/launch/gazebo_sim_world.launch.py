@@ -2,8 +2,9 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 
@@ -11,6 +12,12 @@ def generate_launch_description():
     this_pkg = get_package_share_directory("robot")
     pkg_ros_gz_sim = get_package_share_directory("ros_gz_sim")
     world_file = os.path.join(this_pkg, "world", "house.sdf")
+
+    use_rviz = DeclareLaunchArgument(
+        "use_rviz",
+        default_value="true",
+        description="Start RViz from display.launch.py.",
+    )
 
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -27,6 +34,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             "use_joint_state_publisher": "false",
+            "use_rviz": LaunchConfiguration("use_rviz"),
         }.items(),
     )
 
@@ -76,6 +84,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        use_rviz,
         gz_sim,
         spawn,
         mycar_desc,
