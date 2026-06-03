@@ -1,27 +1,33 @@
-# ROS2 移动机器人 Gazebo 仿真演示
+# ROS2 Mobile Robot Simulation
 
-本仓库当前实现的是一个 ROS2 Jazzy 下的小车模型显示与 Gazebo 仿真示例，包含：
+基于 ROS2 Jazzy 的移动机器人 Gazebo 仿真项目，包含小车模型、Gazebo 室内环境、激光雷达、差速驱动、ROS-Gazebo bridge、RViz 可视化和 SLAM Toolbox 建图。
 
-- Xacro/URDF 小车模型
-- Gazebo world 环境
-- Gazebo lidar 仿真雷达与 ROS2 `/scan` 桥接
+## 功能
+
+- Xacro / URDF 小车模型
+- Gazebo 室内 `house.sdf` 仿真环境
 - 差速驱动 Gazebo 插件
-- Gazebo 与 ROS2 的 `/cmd_vel`、`/odom`、`/tf`、`/joint_states`、`/clock` 桥接
-- RViz2 模型与 TF 可视化
-
-> 注意：当前代码还没有实现 SLAM、Navigation2、YOLO 目标检测或 STM32 串口通信。仓库中也没有 `slam.launch.py`、`nav.launch.py`、`yolo.launch.py`。
+- Gazebo lidar 仿真雷达与 ROS2 `/scan` 桥接
+- `/cmd_vel`、`/odom`、`/tf`、`/joint_states`、`/clock` 桥接
+- RViz2 机器人模型、TF、雷达、里程计和地图显示
+- SLAM Toolbox 在线建图
+- 键盘遥控小车运动
 
 ## 仓库结构
 
 ```text
-robot_ws/
+ros2-mobile-robot-main/
 ├── src/
 │   └── robot/
+│       ├── config/
+│       │   └── slam_toolbox.yaml
 │       ├── launch/
 │       │   ├── display.launch.py
-│       │   └── gazebo_sim_world.launch.py
+│       │   ├── gazebo_sim_world.launch.py
+│       │   └── slam.launch.py
 │       ├── rviz/
-│       │   └── display.rviz
+│       │   ├── display.rviz
+│       │   └── slam.rviz
 │       ├── urdf/
 │       │   ├── car.urdf.xacro
 │       │   ├── car_base.urdf.xacro
@@ -38,13 +44,15 @@ robot_ws/
 ## 环境要求
 
 - ROS2 Jazzy
+- Gazebo Sim 8
 - `colcon`
 - `rviz2`
 - `xacro`
 - `robot_state_publisher`
-- `joint_state_publisher`
 - `ros_gz_sim`
 - `ros_gz_bridge`
+- `slam_toolbox`
+- `teleop_twist_keyboard`
 
 ## 编译
 
@@ -54,7 +62,7 @@ colcon build --symlink-install
 source install/setup.bash
 ```
 
-## 运行
+## 运行模型显示
 
 只显示机器人模型和 RViz：
 
@@ -62,43 +70,98 @@ source install/setup.bash
 ros2 launch robot display.launch.py
 ```
 
-启动 Gazebo 仿真、机器人模型、RViz 和 ROS-Gazebo bridge：
+## 运行 Gazebo 仿真
+
+启动 Gazebo、机器人模型、RViz 和 ROS-Gazebo bridge：
 
 ```bash
 ros2 launch robot gazebo_sim_world.launch.py
 ```
 
-## 运行后可用话题
-
-典型话题包括：
-
-```text
-/clock
-/cmd_vel
-/joint_states
-/odom
-/scan
-/robot_description
-/tf
-/tf_static
-```
-
-可以用键盘控制节点发布速度命令，例如：
+不启动 RViz：
 
 ```bash
-ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/cmd_vel
+ros2 launch robot gazebo_sim_world.launch.py use_rviz:=false
 ```
+
+## 运行 SLAM 建图
+
+一键启动 Gazebo、机器人模型、ROS-Gazebo bridge、SLAM Toolbox 和 RViz：
+
+```bash
+ros2 launch robot slam.launch.py
+```
+
+只启动 Gazebo 和 SLAM，不启动 RViz：
+
+```bash
+ros2 launch robot slam.launch.py slam_rviz:=false
+```
+
+SLAM 相关坐标系和话题：
+
+```text
+map_frame: map
+odom_frame: odom
+base_frame: base_footprint
+scan_topic: /scan
+```
+
+启动成功后可看到以下话题：
+
+```text
+/map
+/map_metadata
+/scan
+/odom
+/tf
+/cmd_vel
+/slam_toolbox/graph_visualization
+/slam_toolbox/scan_visualization
+```
+
+## 键盘遥控
+
+另开一个终端：
+
+```bash
+cd ros2-mobile-robot-main
+source install/setup.bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r cmd_vel:=/cmd_vel
+```
+
+常用按键：
+
+```text
+i  前进
+,  后退
+j  左转
+l  右转
+k  停止
+q  提高速度
+z  降低速度
+```
+
+## 保存地图
+
+建图完成后可保存地图：
+
+```bash
+ros2 run nav2_map_server map_saver_cli -f my_map
+```
+
+如果系统没有安装 `nav2_map_server`，需要先安装对应 ROS2 Jazzy 包。
 
 ## 当前限制
 
 - `car_camera.urdf.xacro` 目前只定义相机外形，还没有 Gazebo camera sensor，因此不会发布图像话题。
-- 尚未接入 SLAM Toolbox、Cartographer、Navigation2 或 YOLO。
-- README 中未来如果加入这些功能，应同时提交对应 launch、config 和节点源码。
+- 当前实现到 SLAM 建图阶段，尚未接入 Navigation2 自主导航。
+- 如果用于真实机器人，还需要添加串口/CAN 底盘通信节点和真实传感器标定参数。
 
 ## 后续扩展建议
 
-1. 给雷达 link 添加 Gazebo lidar sensor，并桥接到 `/scan`。
-2. 给相机 link 添加 camera sensor，并桥接图像话题。
-3. 添加 SLAM Toolbox 或 Cartographer 配置与 launch。
-4. 添加 Nav2 map、planner/controller 参数与 bringup launch。
-5. 如需真实机器人，再添加串口通信节点和底盘协议文档。
+1. 添加 Gazebo camera sensor 并桥接图像话题。
+2. 添加 Navigation2 参数、地图加载和导航 launch。
+3. 添加 AMCL 或 SLAM Toolbox localization 模式。
+4. 添加真实底盘通信节点和硬件接口文档。
+5. 增加地图保存目录和导航示例地图。
