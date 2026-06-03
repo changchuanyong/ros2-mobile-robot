@@ -8,8 +8,8 @@
     </material>
 
     <!-- 雷达属性 -->
-    <xacro:property name="laser_length" value="0.03" /> <!-- 雷达长度 -->
-    <xacro:property name="laser_radius" value="0.03" /> <!-- 雷达半径 -->
+    <xacro:property name="laser_length" value="0.05" /> <!-- 雷达长度 -->
+    <xacro:property name="laser_radius" value="0.05" /> <!-- 雷达半径 -->
     <xacro:property name="laser_joint_x" value="0.0" /> <!-- 雷达安装的x坐标 -->
     <xacro:property name="laser_joint_y" value="0.0" /> <!-- 雷达安装的y坐标 -->
     <xacro:property name="laser_joint_z" value="${base_link_z / 2 + laser_length / 2}" /> <!-- 雷达安装的z坐标:车体高度 / 2 + 雷达高度 / 2  -->
@@ -30,4 +30,33 @@
         <child link="laser" />
         <origin xyz="${laser_joint_x} ${laser_joint_y} ${laser_joint_z}" />
     </joint>
+
+    <gazebo reference="laser">
+        <sensor name="laser_sensor" type="gpu_lidar">
+            <topic>/scan</topic>
+            <update_rate>10</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>360</samples>
+                        <resolution>1</resolution>
+                        <min_angle>-${PI}</min_angle>
+                        <max_angle>${PI}</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.12</min>
+                    <max>8.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+                <noise>
+                    <type>gaussian</type>
+                    <mean>0.0</mean>
+                    <stddev>0.01</stddev>
+                </noise>
+            </ray>
+            <always_on>true</always_on>
+            <visualize>true</visualize>
+        </sensor>
+    </gazebo>
 </robot>

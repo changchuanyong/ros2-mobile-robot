@@ -6,18 +6,17 @@
     <!-- 运动控制插件 -->
     <gazebo>
         <plugin
-            filename="libignition-gazebo-diff-drive-system.so"
-            name="ignition::gazebo::systems::DiffDrive">
+            filename="gz-sim-diff-drive-system"
+            name="gz::sim::systems::DiffDrive">
             <left_joint>left_front_wheel_joint</left_joint>
             <left_joint>left_rear_wheel_joint</left_joint>
             <right_joint>right_front_wheel_joint</right_joint>
             <right_joint>right_rear_wheel_joint</right_joint>
-            <wheel_separation>0.4</wheel_separation>
-            <wheel_radius>0.0415</wheel_radius>
+            <wheel_separation>0.30</wheel_separation>
+            <wheel_radius>0.065</wheel_radius>
             <odom_publish_frequency>50</odom_publish_frequency>
             <frame_id>odom</frame_id>
             <child_frame_id>base_footprint</child_frame_id>
-            <topic>/cmd_vel</topic>
             <publish_wheel_tf>true</publish_wheel_tf>
             <max_linear_acceleration>10</max_linear_acceleration>
             <min_linear_acceleration>-10</min_linear_acceleration>
@@ -33,8 +32,8 @@
     
     <!-- 关节状态发布 -->
     <gazebo>
-        <plugin filename="ignition-gazebo-joint-state-publisher-system"
-        name="ignition::gazebo::systems::JointStatePublisher">
+        <plugin filename="gz-sim-joint-state-publisher-system"
+        name="gz::sim::systems::JointStatePublisher">
         </plugin>
     </gazebo>
 

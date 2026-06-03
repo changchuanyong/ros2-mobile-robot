@@ -1,117 +1,104 @@
+# ROS2 移动机器人 Gazebo 仿真演示
 
-# ROS2 移动机器人系统架构与 SLAM 导航演示
+本仓库当前实现的是一个 ROS2 Jazzy 下的小车模型显示与 Gazebo 仿真示例，包含：
 
-> STM32 下位机 + 树莓派上位机 + Gazebo 仿真 + Cartographer SLAM + Navigation2 + YOLO 目标检测
+- Xacro/URDF 小车模型
+- Gazebo world 环境
+- Gazebo lidar 仿真雷达与 ROS2 `/scan` 桥接
+- 差速驱动 Gazebo 插件
+- Gazebo 与 ROS2 的 `/cmd_vel`、`/odom`、`/tf`、`/joint_states`、`/clock` 桥接
+- RViz2 模型与 TF 可视化
 
-## 项目简介
-
-本项目展示了一个 **完整的 ROS2 移动机器人系统架构**，涵盖：
-
-- **下位机 STM32** 控制底盘运动，串口与上位机交互  
-- **上位机树莓派** 运行 ROS2 节点，实现 SLAM、路径规划、导航控制与 YOLO 环境感知  
-- **Gazebo 仿真**：机器人建模、传感器模拟、运动验证  
-- **SLAM & Navigation2**：二维激光 SLAM 建图 + 路径规划与导航  
-- **RViz2 可视化**：实时显示地图、位姿、传感器数据与目标识别结果  
-
-
+> 注意：当前代码还没有实现 SLAM、Navigation2、YOLO 目标检测或 STM32 串口通信。仓库中也没有 `slam.launch.py`、`nav.launch.py`、`yolo.launch.py`。
 
 ## 仓库结构
 
-```
-
+```text
 robot_ws/
 ├── src/
 │   └── robot/
-│       ├── launch/              # 启动文件
-│       │   ├── slam.launch.py
-│       │   ├── nav.launch.py
-│       │   └── yolo.launch.py
-│       ├── config/              # 参数配置文件
-│       │   ├── cartographer.yaml
-│       │   ├── nav2_params.yaml
-│       │   └── yolo_params.yaml
-│       ├── urdf/                # 机器人 URDF / Xacro
-│       ├── meshes/              # 机器人三维模型
-│       ├── src/                 # ROS2 节点源码（C++ / Python）
-│       ├── CMakeLists.txt
-│       └── package.xml
+│       ├── launch/
+│       │   ├── display.launch.py
+│       │   └── gazebo_sim_world.launch.py
+│       ├── rviz/
+│       │   └── display.rviz
+│       ├── urdf/
+│       │   ├── car.urdf.xacro
+│       │   ├── car_base.urdf.xacro
+│       │   ├── car_camera.urdf.xacro
+│       │   └── car_laser.urdf.xacro
+│       ├── world/
+│       │   └── house.sdf
+│       ├── package.xml
+│       └── setup.py
 ├── README.md
 └── .gitignore
+```
 
-````
+## 环境要求
 
----
+- ROS2 Jazzy
+- `colcon`
+- `rviz2`
+- `xacro`
+- `robot_state_publisher`
+- `joint_state_publisher`
+- `ros_gz_sim`
+- `ros_gz_bridge`
 
-## 功能模块
-
-### 1️⃣ 系统架构
-- STM32 下位机控制底盘运动  
-- 树莓派上位机运行 ROS2 节点  
-- 串口通信完成控制指令与状态数据交互  
-
-### 2️⃣ 机器人建模与仿真
-- URDF/Xacro 描述机器人结构  
-- Gazebo 仿真底盘、传感器（激光雷达、IMU、编码器）  
-- 支持运动学和传感器数据验证  
-
-### 3️⃣ SLAM & Navigation2
-- Cartographer 实现二维激光 SLAM  
-- Navigation2 路径规划与自主导航  
-- 与 RViz2 联动，实时可视化地图、位姿与传感器数据  
-
-### 4️⃣ YOLO 目标识别
-- 集成 YOLO 模型，实现环境目标感知  
-- 可与导航决策结合，完成任务优化  
-
----
-
-## 安装与运行
-
-### 1. 克隆仓库
-```bash
-git clone https://github.com/changchuanyong/robot_ws.git
-cd robot_ws
-````
-
-### 2. 编译 ROS2 工作空间
+## 编译
 
 ```bash
+cd ros2-mobile-robot-main
 colcon build --symlink-install
 source install/setup.bash
 ```
 
-### 3. 启动 Gazebo + SLAM + Navigation2 + YOLO
+## 运行
+
+只显示机器人模型和 RViz：
 
 ```bash
-# 启动 SLAM
-ros2 launch robot slam.launch.py
-
-# 启动 Navigation2
-ros2 launch robot nav.launch.py
-
-# 启动 YOLO 目标检测
-ros2 launch robot yolo.launch.py
+ros2 launch robot display.launch.py
 ```
 
-> 可在 RViz2 中可视化 `/map`, `/tf`, `/scan`, `/robot_status`, `/yolo_objects` 等话题
+启动 Gazebo 仿真、机器人模型、RViz 和 ROS-Gazebo bridge：
 
----
+```bash
+ros2 launch robot gazebo_sim_world.launch.py
+```
 
-## 技术亮点
+## 运行后可用话题
 
-* **完整系统架构**：节点化、模块化、上下位机协作
-* **SLAM + Navigation2**：自主建图与导航，符合 ROS2 实习岗位技能
-* **Gazebo + RViz2 仿真**：可快速验证机器人运动与算法
-* **YOLO 环境感知**：可结合路径规划优化导航
-* **可扩展性强**：支持多机器人、传感器和任务拓展
+典型话题包括：
 
----
+```text
+/clock
+/cmd_vel
+/joint_states
+/odom
+/scan
+/robot_description
+/tf
+/tf_static
+```
 
-## 未来扩展建议
+可以用键盘控制节点发布速度命令，例如：
 
-* 集成多机器人通信
-* 增加传感器融合（IMU + 编码器 + 激光雷达）
-* 加入动态目标避障与任务规划
-* 支持真实机器人部署
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/cmd_vel
+```
 
+## 当前限制
 
+- `car_camera.urdf.xacro` 目前只定义相机外形，还没有 Gazebo camera sensor，因此不会发布图像话题。
+- 尚未接入 SLAM Toolbox、Cartographer、Navigation2 或 YOLO。
+- README 中未来如果加入这些功能，应同时提交对应 launch、config 和节点源码。
+
+## 后续扩展建议
+
+1. 给雷达 link 添加 Gazebo lidar sensor，并桥接到 `/scan`。
+2. 给相机 link 添加 camera sensor，并桥接图像话题。
+3. 添加 SLAM Toolbox 或 Cartographer 配置与 launch。
+4. 添加 Nav2 map、planner/controller 参数与 bringup launch。
+5. 如需真实机器人，再添加串口通信节点和底盘协议文档。

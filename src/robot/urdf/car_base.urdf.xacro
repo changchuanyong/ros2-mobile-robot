@@ -4,14 +4,14 @@
     <xacro:property name="PI" value="3.1416"/>
     <!-- 定义车辆参数 -->
     <!-- 车体长宽高 -->
-    <xacro:property name="base_link_x" value="0.2"/>
-    <xacro:property name="base_link_y" value="0.12"/>
-    <xacro:property name="base_link_z" value="0.07"/>
+    <xacro:property name="base_link_x" value="0.45"/>
+    <xacro:property name="base_link_y" value="0.30"/>
+    <xacro:property name="base_link_z" value="0.16"/>
     <!-- 离地间距 -->
-    <xacro:property name="distance" value="0.015"/>
+    <xacro:property name="distance" value="0.04"/>
     <!-- 车轮半径 宽度 -->
-    <xacro:property name="wheel_radius" value="0.025"/>
-    <xacro:property name="wheel_length" value="0.02"/>
+    <xacro:property name="wheel_radius" value="0.065"/>
+    <xacro:property name="wheel_length" value="0.035"/>
 
     <!-- 定义颜色 -->
     <material name="yellow">
