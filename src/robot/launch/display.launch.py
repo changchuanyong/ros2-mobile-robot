@@ -24,6 +24,11 @@ def generate_launch_description():
         default_value="true",
         description="Start RViz with the package display configuration.",
     )
+    use_sim_time = DeclareLaunchArgument(
+        name="use_sim_time",
+        default_value="true",
+        description="Use simulation clock for Gazebo/RViz workflows.",
+    )
 
     robot_description = ParameterValue(
         Command(["xacro ", LaunchConfiguration("model")]),
@@ -32,24 +37,32 @@ def generate_launch_description():
     robot_state_publisher = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
-        parameters=[{"robot_description": robot_description}],
+        parameters=[
+            {
+                "robot_description": robot_description,
+                "use_sim_time": LaunchConfiguration("use_sim_time"),
+            }
+        ],
     )
     joint_state_publisher = Node(
         package="joint_state_publisher",
         executable="joint_state_publisher",
         condition=IfCondition(LaunchConfiguration("use_joint_state_publisher")),
+        parameters=[{"use_sim_time": LaunchConfiguration("use_sim_time")}],
     )
     rviz2 = Node(
         package="rviz2",
         executable="rviz2",
         arguments=["-d", default_rviz_path],
         condition=IfCondition(LaunchConfiguration("use_rviz")),
+        parameters=[{"use_sim_time": LaunchConfiguration("use_sim_time")}],
     )
 
     return LaunchDescription([
         model,
         use_joint_state_publisher,
         use_rviz,
+        use_sim_time,
         robot_state_publisher,
         joint_state_publisher,
         rviz2,

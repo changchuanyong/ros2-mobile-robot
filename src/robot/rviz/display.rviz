@@ -289,7 +289,7 @@ Visualization Manager:
     Saved: ~
 Window Geometry:
   Displays:
-    collapsed: false
+    collapsed: true
   Height: 1000
   Hide Left Dock: false
   Hide Right Dock: false
@@ -298,9 +298,9 @@ Window Geometry:
   Time:
     collapsed: false
   Tool Properties:
-    collapsed: false
+    collapsed: true
   Views:
-    collapsed: false
+    collapsed: true
   Width: 1600
   X: 80
   Y: 60

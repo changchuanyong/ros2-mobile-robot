@@ -35,6 +35,7 @@ def generate_launch_description():
         launch_arguments={
             "use_joint_state_publisher": "false",
             "use_rviz": LaunchConfiguration("use_rviz"),
+            "use_sim_time": "true",
         }.items(),
     )
 
@@ -55,7 +56,7 @@ def generate_launch_description():
         package="tf2_ros",
         executable="static_transform_publisher",
         arguments=[
-            "--x", "0", "--y", "0", "--z", "0",
+            "--x", "0", "--y", "0", "--z", "0.105",
             "--roll", "0", "--pitch", "0", "--yaw", "0",
             "--frame-id", "base_link",
             "--child-frame-id", "mycar/base_footprint/laser_sensor",
