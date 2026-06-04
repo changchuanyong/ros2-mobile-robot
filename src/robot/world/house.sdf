@@ -12,6 +12,7 @@
     <plugin name='gz::sim::systems::Sensors' filename='gz-sim-sensors-system'>
       <render_engine>ogre2</render_engine>
     </plugin>
+    <plugin name='gz::sim::systems::Imu' filename='gz-sim-imu-system'/>
     <plugin name='gz::sim::systems::Contact' filename='gz-sim-contact-system'/>
 
     <gravity>0 0 -9.8</gravity>

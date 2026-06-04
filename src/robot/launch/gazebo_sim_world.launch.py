@@ -3,6 +3,7 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -17,6 +18,12 @@ def generate_launch_description():
         "use_rviz",
         default_value="true",
         description="Start RViz from display.launch.py.",
+    )
+
+    bridge_tf = DeclareLaunchArgument(
+        "bridge_tf",
+        default_value="true",
+        description="Bridge Gazebo model TF. Disable when FAST-LIO publishes map->base_footprint.",
     )
 
     gz_sim = IncludeLaunchDescription(
@@ -64,31 +71,83 @@ def generate_launch_description():
         output="screen",
     )
 
+
+    point_lidar_frame_tf = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        arguments=[
+            "--x", "0", "--y", "0", "--z", "0.105",
+            "--roll", "0", "--pitch", "0", "--yaw", "0",
+            "--frame-id", "base_link",
+            "--child-frame-id", "mycar/base_footprint/point_lidar",
+        ],
+        output="screen",
+    )
+
+    imu_frame_tf = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        arguments=[
+            "--x", "0", "--y", "0", "--z", "0.12",
+            "--roll", "0", "--pitch", "0", "--yaw", "0",
+            "--frame-id", "base_link",
+            "--child-frame-id", "mycar/base_footprint/imu_sensor",
+        ],
+        output="screen",
+    )
+
     bridge = Node(
         package="ros_gz_bridge",
         executable="parameter_bridge",
         arguments=[
             "/model/mycar/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist",
             "/model/mycar/odometry@nav_msgs/msg/Odometry[gz.msgs.Odometry",
-            "/model/mycar/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V",
             "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
             "/world/empty/model/mycar/joint_state@sensor_msgs/msg/JointState[gz.msgs.Model",
             "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
+            "/imu@sensor_msgs/msg/Imu[gz.msgs.IMU",
         ],
         remappings=[
             ("/model/mycar/cmd_vel", "/cmd_vel"),
-            ("/model/mycar/tf", "/tf"),
             ("/world/empty/model/mycar/joint_state", "/joint_states"),
             ("/model/mycar/odometry", "/odom"),
         ],
         output="screen",
     )
 
+
+    gazebo_tf_bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        arguments=[
+            "/model/mycar/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V",
+        ],
+        remappings=[
+            ("/model/mycar/tf", "/tf"),
+        ],
+        condition=IfCondition(LaunchConfiguration("bridge_tf")),
+        output="screen",
+    )
+
+    point_cloud_bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        arguments=[
+            "/points/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked",
+        ],
+        output="screen",
+    )
+
     return LaunchDescription([
         use_rviz,
+        bridge_tf,
         gz_sim,
         spawn,
         mycar_desc,
         laser_frame_tf,
+        point_lidar_frame_tf,
+        imu_frame_tf,
         bridge,
+        gazebo_tf_bridge,
+        point_cloud_bridge,
     ])

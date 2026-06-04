@@ -1,0 +1,3 @@
+[submodule "src/spark-fast-lio"]
+	path = src/spark-fast-lio
+	url = https://github.com/MIT-SPARK/spark-fast-lio.git

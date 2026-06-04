@@ -58,5 +58,37 @@
             <always_on>true</always_on>
             <visualize>true</visualize>
         </sensor>
+        <sensor name="point_lidar" type="gpu_lidar">
+            <topic>/points</topic>
+            <update_rate>10</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>720</samples>
+                        <resolution>1</resolution>
+                        <min_angle>-${PI}</min_angle>
+                        <max_angle>${PI}</max_angle>
+                    </horizontal>
+                    <vertical>
+                        <samples>16</samples>
+                        <resolution>1</resolution>
+                        <min_angle>-0.261799</min_angle>
+                        <max_angle>0.261799</max_angle>
+                    </vertical>
+                </scan>
+                <range>
+                    <min>0.2</min>
+                    <max>20.0</max>
+                    <resolution>0.02</resolution>
+                </range>
+                <noise>
+                    <type>gaussian</type>
+                    <mean>0.0</mean>
+                    <stddev>0.01</stddev>
+                </noise>
+            </ray>
+            <always_on>true</always_on>
+            <visualize>true</visualize>
+        </sensor>
     </gazebo>
 </robot>

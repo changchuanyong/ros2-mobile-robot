@@ -27,6 +27,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'pointcloud_time_adapter = robot.pointcloud_time_adapter:main',
         ],
     },
 )

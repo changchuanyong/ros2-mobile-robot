@@ -1,0 +1,50 @@
+/**:
+  ros__parameters:
+    use_sim_time: true
+
+    common:
+      lid_topic: /points/points
+      imu_topic: /imu
+      lidar_frame: mycar/base_footprint/point_lidar
+      imu_frame: mycar/base_footprint/imu_sensor
+      map_frame: map
+      base_frame: base_footprint
+      visualization_frame: base
+      time_sync_en: false
+
+    gravity_alignment:
+      enable_gravity_alignment: false
+
+    preprocess:
+      # Gazebo point_lidar is configured as a 16-line spinning lidar.
+      lidar_type: 2
+      scan_line: 16
+      scan_rate: 10
+      timestamp_unit: 0
+      blind: 0.2
+
+    mapping:
+      acc_cov: 0.1
+      gyr_cov: 0.1
+      b_acc_cov: 0.003
+      b_gyr_cov: 0.001
+      fov_degree: 360.0
+      det_range: 20.0
+      extrinsic_est_en: false
+      # LiDAR position relative to IMU: lidar z=0.105, imu z=0.120.
+      extrinsic_T: [0.0, 0.0, -0.015]
+      extrinsic_R: [1.0, 0.0, 0.0,
+                    0.0, 1.0, 0.0,
+                    0.0, 0.0, 1.0]
+
+    filter_size_map: 0.2
+
+    publish:
+      path_en: true
+      scan_publish_en: true
+      dense_publish_en: true
+      scan_bodyframe_pub_en: true
+
+    pcd_save:
+      pcd_save_en: false
+      interval: -1

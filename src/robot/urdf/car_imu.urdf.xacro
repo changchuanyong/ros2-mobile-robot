@@ -1,0 +1,36 @@
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+    <material name="black">
+        <color rgba="0.02 0.02 0.02 1.0" />
+    </material>
+
+    <link name="imu_link">
+        <visual>
+            <geometry>
+                <box size="0.05 0.04 0.02" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="black" />
+        </visual>
+        <collision>
+            <geometry>
+                <box size="0.05 0.04 0.02" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+        </collision>
+        <xacro:box_inertia m="0.02" w="0.05" d="0.04" h="0.02" />
+    </link>
+
+    <joint name="imu2baselink" type="fixed">
+        <parent link="base_link" />
+        <child link="imu_link" />
+        <origin xyz="0 0 0.12" rpy="0 0 0" />
+    </joint>
+
+    <gazebo reference="imu_link">
+        <sensor name="imu_sensor" type="imu">
+            <topic>/imu</topic>
+            <update_rate>200</update_rate>
+            <always_on>true</always_on>
+        </sensor>
+    </gazebo>
+</robot>
