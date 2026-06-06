@@ -5,19 +5,22 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
     this_pkg = get_package_share_directory("robot")
     pkg_ros_gz_sim = get_package_share_directory("ros_gz_sim")
     world_file = os.path.join(this_pkg, "world", "house.sdf")
+    model_file = os.path.join(this_pkg, "urdf", "car.urdf.xacro")
+    rviz_file = os.path.join(this_pkg, "rviz", "display.rviz")
 
     use_rviz = DeclareLaunchArgument(
         "use_rviz",
         default_value="true",
-        description="Start RViz from display.launch.py.",
+        description="Start RViz with the package display configuration.",
     )
 
     bridge_tf = DeclareLaunchArgument(
@@ -26,23 +29,36 @@ def generate_launch_description():
         description="Bridge Gazebo model TF. Disable when FAST-LIO publishes map->base_footprint.",
     )
 
+    robot_description = ParameterValue(
+        Command(["xacro ", model_file]),
+        value_type=str,
+    )
+
+    robot_state_publisher = Node(
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        parameters=[{
+            "robot_description": robot_description,
+            "use_sim_time": True,
+        }],
+        output="screen",
+    )
+
+    rviz = Node(
+        package="rviz2",
+        executable="rviz2",
+        arguments=["-d", rviz_file],
+        parameters=[{"use_sim_time": True}],
+        condition=IfCondition(LaunchConfiguration("use_rviz")),
+        output="screen",
+    )
+
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ros_gz_sim, "launch", "gz_sim.launch.py")
         ),
         launch_arguments={
             "gz_args": "-r " + world_file,
-        }.items(),
-    )
-
-    mycar_desc = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(this_pkg, "launch", "display.launch.py")
-        ),
-        launch_arguments={
-            "use_joint_state_publisher": "false",
-            "use_rviz": LaunchConfiguration("use_rviz"),
-            "use_sim_time": "true",
         }.items(),
     )
 
@@ -70,7 +86,6 @@ def generate_launch_description():
         ],
         output="screen",
     )
-
 
     point_lidar_frame_tf = Node(
         package="tf2_ros",
@@ -115,7 +130,6 @@ def generate_launch_description():
         output="screen",
     )
 
-
     gazebo_tf_bridge = Node(
         package="ros_gz_bridge",
         executable="parameter_bridge",
@@ -142,8 +156,9 @@ def generate_launch_description():
         use_rviz,
         bridge_tf,
         gz_sim,
+        robot_state_publisher,
+        rviz,
         spawn,
-        mycar_desc,
         laser_frame_tf,
         point_lidar_frame_tf,
         imu_frame_tf,
