@@ -8,12 +8,12 @@ from sensor_msgs.msg import PointCloud2, PointField
 
 class PointCloudTimeAdapter(Node):
     def __init__(self):
-        super().__init__("pointcloud_time_adapter")
-        self.declare_parameter("input_topic", "/points/points")
-        self.declare_parameter("output_topic", "/points/fast_lio")
+        super().__init__('pointcloud_time_adapter')
+        self.declare_parameter('input_topic', '/points/points')
+        self.declare_parameter('output_topic', '/points/fast_lio')
 
-        input_topic = self.get_parameter("input_topic").value
-        output_topic = self.get_parameter("output_topic").value
+        input_topic = self.get_parameter('input_topic').value
+        output_topic = self.get_parameter('output_topic').value
 
         qos = QoSProfile(
             history=HistoryPolicy.KEEP_LAST,
@@ -27,7 +27,7 @@ class PointCloudTimeAdapter(Node):
         )
 
     def pointcloud_callback(self, msg):
-        if any(field.name == "time" for field in msg.fields):
+        if any(field.name == 'time' for field in msg.fields):
             self.publisher.publish(msg)
             return
 
@@ -40,7 +40,7 @@ class PointCloudTimeAdapter(Node):
         out.is_dense = msg.is_dense
 
         time_field = PointField()
-        time_field.name = "time"
+        time_field.name = 'time'
         time_field.offset = msg.point_step
         time_field.datatype = PointField.FLOAT32
         time_field.count = 1
@@ -51,7 +51,7 @@ class PointCloudTimeAdapter(Node):
 
         point_count = msg.width * msg.height
         if point_count == 0:
-            out.data = b""
+            out.data = b''
             self.publisher.publish(out)
             return
 
@@ -86,5 +86,5 @@ def main(args=None):
         rclpy.shutdown()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

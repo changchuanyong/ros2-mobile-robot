@@ -23,7 +23,7 @@ bt_navigator:
 controller_server:
   ros__parameters:
     use_sim_time: true
-    controller_frequency: 10.0
+    controller_frequency: 20.0
     min_x_velocity_threshold: 0.001
     min_y_velocity_threshold: 0.5
     min_theta_velocity_threshold: 0.001
@@ -34,12 +34,12 @@ controller_server:
 
     progress_checker:
       plugin: nav2_controller::SimpleProgressChecker
-      required_movement_radius: 0.2
-      movement_time_allowance: 10.0
+      required_movement_radius: 0.1
+      movement_time_allowance: 5.0
 
     general_goal_checker:
       plugin: nav2_controller::SimpleGoalChecker
-      stateful: true
+      stateful: false
       xy_goal_tolerance: 0.20
       yaw_goal_tolerance: 0.25
 
@@ -48,29 +48,29 @@ controller_server:
       debug_trajectory_details: false
       min_vel_x: 0.0
       min_vel_y: 0.0
-      max_vel_x: 0.22
+      max_vel_x: 0.34
       max_vel_y: 0.0
-      max_vel_theta: 0.8
+      max_vel_theta: 1.1
       min_speed_xy: 0.0
-      max_speed_xy: 0.22
+      max_speed_xy: 0.34
       min_speed_theta: 0.0
-      acc_lim_x: 0.6
+      acc_lim_x: 1.0
       acc_lim_y: 0.0
-      acc_lim_theta: 1.0
-      decel_lim_x: -0.6
+      acc_lim_theta: 1.6
+      decel_lim_x: -1.0
       decel_lim_y: 0.0
-      decel_lim_theta: -1.0
+      decel_lim_theta: -1.6
       vx_samples: 15
       vy_samples: 1
       vtheta_samples: 20
-      sim_time: 1.7
+      sim_time: 1.2
       linear_granularity: 0.05
       angular_granularity: 0.025
       transform_tolerance: 0.3
       xy_goal_tolerance: 0.20
       trans_stopped_velocity: 0.03
       short_circuit_trajectory_evaluation: true
-      stateful: true
+      stateful: false
       critics: [RotateToGoal, Oscillation, BaseObstacle, GoalAlign, PathAlign, PathDist, GoalDist]
       BaseObstacle.scale: 0.02
       PathAlign.scale: 16.0
@@ -80,15 +80,15 @@ controller_server:
       PathDist.scale: 24.0
       GoalDist.scale: 24.0
       RotateToGoal.scale: 24.0
-      RotateToGoal.slowing_factor: 5.0
+      RotateToGoal.slowing_factor: 2.0
       RotateToGoal.lookahead_time: -1.0
 
 local_costmap:
   local_costmap:
     ros__parameters:
       use_sim_time: true
-      update_frequency: 5.0
-      publish_frequency: 2.0
+      update_frequency: 10.0
+      publish_frequency: 5.0
       global_frame: odom
       robot_base_frame: base_footprint
       rolling_window: true
@@ -168,7 +168,7 @@ global_costmap:
 planner_server:
   ros__parameters:
     use_sim_time: true
-    expected_planner_frequency: 5.0
+    expected_planner_frequency: 10.0
     planner_plugins: [GridBased]
     GridBased:
       plugin: nav2_navfn_planner::NavfnPlanner
@@ -193,7 +193,7 @@ behavior_server:
     global_costmap_topic: global_costmap/costmap_raw
     local_footprint_topic: local_costmap/published_footprint
     global_footprint_topic: global_costmap/published_footprint
-    cycle_frequency: 10.0
+    cycle_frequency: 20.0
     behavior_plugins: [spin, backup, drive_on_heading, wait]
     spin:
       plugin: nav2_behaviors::Spin
@@ -207,10 +207,10 @@ behavior_server:
     global_frame: map
     robot_base_frame: base_footprint
     transform_tolerance: 0.3
-    simulate_ahead_time: 2.0
-    max_rotational_vel: 0.8
+    simulate_ahead_time: 1.0
+    max_rotational_vel: 1.1
     min_rotational_vel: 0.2
-    rotational_acc_lim: 1.0
+    rotational_acc_lim: 1.6
 
 waypoint_follower:
   ros__parameters:
@@ -223,16 +223,19 @@ waypoint_follower:
       enabled: true
       waypoint_pause_duration: 200
 
+
 velocity_smoother:
   ros__parameters:
     use_sim_time: true
-    smoothing_frequency: 20.0
+    cmd_vel_in: cmd_vel_nav
+    cmd_vel_out: cmd_vel_smoothed
+    smoothing_frequency: 30.0
     scale_velocities: false
     feedback: OPEN_LOOP
-    max_velocity: [0.22, 0.0, 0.8]
+    max_velocity: [0.34, 0.0, 1.1]
     min_velocity: [0.0, 0.0, -0.8]
-    max_accel: [0.6, 0.0, 1.0]
-    max_decel: [-0.6, 0.0, -1.0]
+    max_accel: [1.0, 0.0, 1.6]
+    max_decel: [-1.0, 0.0, -1.6]
     odom_topic: /odom
     odom_duration: 0.1
     deadband_velocity: [0.0, 0.0, 0.0]
@@ -255,7 +258,7 @@ collision_monitor:
       type: polygon
       action_type: approach
       footprint_topic: /local_costmap/published_footprint
-      time_before_collision: 1.2
+      time_before_collision: 0.6
       simulation_time_step: 0.1
       min_points: 6
       visualize: false
